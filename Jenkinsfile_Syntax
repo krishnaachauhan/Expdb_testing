@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+    
+    environment {
+        // Define your remote server credentials and details
+        REMOTE_SERVER = 'your-remote-server-ip-or-hostname'
+        REMOTE_USER = 'remote-username'
+        SSH_KEY = credentials('jenkins-ssh-key') // SSH key credential ID in Jenkins
+        SCRIPT_PATH = '/path/to/your/script.sh' // Path to script on remote server
+    }
+    
+    stages {
+        stage('Execute Remote Script') {
+            steps {
+                script {
+                    // SSH into the remote server and execute the script
+                    sshagent([SSH_KEY]) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_SERVER} \
+                            'bash -s' < ${SCRIPT_PATH}
+                        """
+                    }
+                    
+                    // Alternative if you need to pass parameters:
+                    // sh """
+                    //     ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_SERVER} \
+                    //     '${SCRIPT_PATH} arg1 arg2'
+                    // """
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            // Cleanup or notifications can go here
+            echo 'Remote script execution completed'
+        }
+    }
+}
