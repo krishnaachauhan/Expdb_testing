@@ -1,5 +1,8 @@
+@Library('jenkins-shared-library@main') _
 pipeline {
-    agent any
+    agent {
+        label 'Node_37'
+    }
     
     environment {
         // Define your remote server credentials and details
