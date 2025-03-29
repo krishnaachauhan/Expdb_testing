@@ -40,7 +40,7 @@ pipeline {
         success {
             emailext(
                 subject: "SUCCESS: ${currentBuild.fullDisplayName}",
-                body: "Build SUCCESS: Job ${env.JOB_NAME} #${env.BUILD_NUMBER}""${currentBuild.rawBuild.getLog(100).join('\n')}",
+                body: "Build SUCCESS: Job ${env.JOB_NAME} #${env.BUILD_NUMBER} #${currentBuild.rawBuild.getLog(100).join('\n')}",
                 to: env.EMAIL_RECIPIENT,
                 // attachmentsPattern: '**/*.tpl'
             )
