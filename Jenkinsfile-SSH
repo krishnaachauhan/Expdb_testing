@@ -1,0 +1,22 @@
+def remote = [:]
+remote.name = 'masternode1'
+remote.host = '10.150.17.38'
+remote.allowAnyHosts = true
+
+pipeline {
+    agent any
+    environment {
+        SERVER_CRED=credentials('Node_38')
+    }
+    stages {
+        stage('SSH') {
+            steps {
+                script {
+                    remote.user=env.SERVER_CRED_USR
+                    remote.password=env.SERVER_CRED_PSW
+                }
+                sshCommand(remote: remote, command: "ls -lrt /opt")
+            }
+        }
+    }
+}
