@@ -1,0 +1,68 @@
+pipeline {
+    agent any
+    
+    environment {
+        REMOTE_SERVER = '10.150.17.37'
+        REMOTE_USER = 'root'
+        SSH_KEY = credentials('Node_37') // SSH key credential ID in Jenkins
+        WORKING_DIR = '/opt/DB/'
+        SCRIPT_NAME = 'create_dir.sh'
+        EMAIL_RECIPIENT = 'krishna.chauhan@bankaiinformatics.co.in'
+    }
+    
+    stages {
+        stage('Verify SSH Connection') {
+            steps {
+                script {
+                    sshagent([SSH_KEY]) {
+                        sh """
+                            echo "Testing SSH connection to ${REMOTE_SERVER}"
+                            ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_SERVER} \
+                            'echo "Successfully connected to $(hostname)"'
+                        """
+                    }
+                }
+            }
+        }
+        
+        stage('Navigate to Working Directory') {
+            steps {
+                script {
+                    sshagent([SSH_KEY]) {
+                        sh """
+                            echo "Changing to directory: ${WORKING_DIR}"
+                            ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_SERVER} \
+                            "cd ${WORKING_DIR} && echo \"Current directory: \$(pwd)\""
+                        """
+                    }
+                }
+            }
+        }
+        
+        stage('Execute Remote Script') {
+            steps {
+                script {
+                    sshagent([SSH_KEY]) {
+                        sh """
+                            echo "Executing script: ${SCRIPT_NAME}"
+                            ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_SERVER} \
+                            "cd ${WORKING_DIR} && ./${SCRIPT_NAME} && echo \"Script executed successfully\" || echo \"Script execution failed\""
+                        """
+                    }
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            echo 'Pipeline execution completed'
+        }
+        success {
+            echo 'All stages completed successfully'
+        }
+        failure {
+            echo 'Pipeline failed - check stage logs for details'
+        }
+    }
+}
