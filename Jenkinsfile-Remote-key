@@ -1,0 +1,47 @@
+def remote = [:]
+remote.name = 'masternode1' //hostname
+remote.host = '10.150.17.38' // IP address
+remote.user = 'root'  // Set the correct user
+remote.allowAnyHosts = true
+
+pipeline {
+    agent any
+    environment {
+        // Jenkins credential ID for the SSH private key
+        SSH_KEY = credentials('Node_38_key')  // Replace with your credential ID
+    }
+    stages {
+        stage('Create Directory & List Files') {
+            steps {
+                script {
+                    // Use sshagent to authenticate via the SSH private key
+                    sshagent (credentials: ['Node_38_key']) {
+                        // Run the create_dir.sh script and then capture the output of ls
+                        def lsOutput = sh(script: """
+                            ssh -o StrictHostKeyChecking=no ${remote.user}@${remote.host} 'cd /opt/ && chmod -R +x create_dir.sh && ./create_dir.sh && ls -l /opt/'
+                        """, returnStdout: true).trim()
+
+                        // Print the ls output to Jenkins console
+                        echo "Directory Listing:\n${lsOutput}"
+
+                        // Save the ls output to a file
+                        writeFile file: 'ls_output.txt', text: lsOutput
+                    }
+                }
+            }
+        }
+        stage('Send Email') {
+            steps {
+                script {
+                    // Send an email with the ls output as an attachment
+                    emailext (
+                        subject: "Directory Listing after Folder Creation",
+                        body: "The directory has been created and the files are listed in the attached file.",
+                        attachmentsPattern: "ls_output.txt",
+                        to: "krishna.chauhan@bankaiinformatics.co.in"  // Replace with the recipient email address
+                    )
+                }
+            }
+        }
+    }
+}
