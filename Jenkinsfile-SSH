@@ -18,7 +18,19 @@ pipeline {
                     remote.password=env.SERVER_CRED_PSW
                 }
                 sshCommand(remote: remote, command: "ls -lrt /opt")
+                sshCommand(remote: remote, command: "cd /opt/ && chmod -R +x create_dir.sh && ./create_dir.sh")
             }
+        }
+    }
+    post {
+        always {
+            echo 'Pipeline execution completed'
+        }
+        success {
+            echo 'All stages completed successfully'
+        }
+        failure {
+            echo 'Pipeline failed - check stage logs for details'
         }
     }
 }
