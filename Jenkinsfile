@@ -9,7 +9,9 @@ pipeline {
         REMOTE_SERVER = '10.150.17.37'
         REMOTE_USER = 'root'
         SSH_KEY = credentials('Node_37') // SSH key credential ID in Jenkins
-        SCRIPT_PATH = '/opt/DB/hello_txt.sh' // Path to script on remote server
+        // SCRIPT_PATH = '/opt/DB/hello_txt.sh' // Path to script on remote server
+        WORKING_DIR = '/opt/DB/' // Directory where script is located
+        SCRIPT_NAME = 'create_dir.sh' // Name of the script to execute
         EMAIL_RECIPIENT = 'krishna.chauhan@bankaiinformatics.co.in'
     }
     
@@ -19,9 +21,13 @@ pipeline {
                 script {
                     // SSH into the remote server and execute the script
                     sshagent([SSH_KEY]) {
+                        // sh """
+                        //     ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_SERVER} \
+                        //     'bash -s' < ${SCRIPT_PATH}
+                        // """
                         sh """
                             ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_SERVER} \
-                            'bash -s' < ${SCRIPT_PATH}
+                            "cd ${WORKING_DIR} && ./${SCRIPT_NAME}"
                         """
                     }
                     
