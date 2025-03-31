@@ -1,3 +1,5 @@
+// Plugin:: Required SSH Pipeline Steps, Publish Over SSH In jenkins,,,, Add Credentials of the servers directly
+
 def remote = [:]
 remote.name = 'masternode1'
 remote.host = '10.150.17.38'
