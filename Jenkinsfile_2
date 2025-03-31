@@ -17,8 +17,7 @@ pipeline {
                     sshagent([SSH_KEY]) {
                         sh """
                             echo "Testing SSH connection to ${REMOTE_SERVER}"
-                            ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_SERVER} \
-                            'echo "Successfully connected to $(hostname)"'
+                            ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_SERVER} 'echo "Successfully connected to $(hostname)"'
                         """
                     }
                 }
@@ -31,8 +30,7 @@ pipeline {
                     sshagent([SSH_KEY]) {
                         sh """
                             echo "Changing to directory: ${WORKING_DIR}"
-                            ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_SERVER} \
-                            "cd ${WORKING_DIR} && echo \"Current directory: \$(pwd)\""
+                            ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_SERVER}  "cd ${WORKING_DIR} && echo \"Current directory: \$(pwd)\""
                         """
                     }
                 }
@@ -45,8 +43,7 @@ pipeline {
                     sshagent([SSH_KEY]) {
                         sh """
                             echo "Executing script: ${SCRIPT_NAME}"
-                            ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_SERVER} \
-                            "cd ${WORKING_DIR} && ./${SCRIPT_NAME} && echo \"Script executed successfully\" || echo \"Script execution failed\""
+                            ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_SERVER} "cd ${WORKING_DIR} && ./${SCRIPT_NAME} && echo \"Script executed successfully\" || echo \"Script execution failed\""
                         """
                     }
                 }
